@@ -9,9 +9,12 @@
   </head>
   <body>
     <h1>Home Page</h1>
+    <% if (!user){ %>
     <p>You are not Logged in</p>
     <a href="/login"><button>Log in</button></a>
+    <% }else{ %>
     <p>You are Logged in</p>
     <a href="/logout"><button>Log out</button></a>
+    <% } %>
   </body>
 </html>
