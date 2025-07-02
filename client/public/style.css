@@ -1,0 +1,39 @@
+/* reset CSS */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* body css */
+body {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* form CSS */
+form {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border: 2px solid black;
+  border-radius: 5px;
+}
+
+form > input,
+form > button {
+  width: 100%;
+  padding: 0.5rem;
+  font-size: 1rem;
+}
+
+form > button {
+  cursor: pointer;
+}
