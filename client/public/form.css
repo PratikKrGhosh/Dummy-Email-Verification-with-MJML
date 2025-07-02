@@ -14,3 +14,11 @@ form {
   border: 2px solid black;
   border-radius: 5px;
 }
+
+p {
+  width: 100%;
+  padding: 0.5rem;
+  background-color: rgb(249, 213, 213);
+  color: rgb(222, 2, 2);
+  border-left: 4px solid red;
+}

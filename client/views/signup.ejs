@@ -23,6 +23,9 @@
         id="password"
         placeholder="Password"
       />
+      <% if (errors){ errors.forEach(err => { %>
+      <p><%= err %></p>
+      <% })} %>
       <button type="submit">Sign up</button>
       <a href="/login">already have an account?</a>
     </form>

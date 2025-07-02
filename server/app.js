@@ -1,9 +1,19 @@
 import express from "express";
 import path from "path";
+import session from "express-session";
+import flash from "connect-flash";
 
 import authRouter from "./routes/auth.route.js";
 
 const app = express();
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+app.use(
+  session({ secret: "my_secret", resave: true, saveUninitialized: false })
+);
+app.use(flash());
 
 app.set("view engine", "ejs");
 app.set("views", path.join(import.meta.dirname, "..", "client", "views"));
