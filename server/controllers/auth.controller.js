@@ -1,6 +1,6 @@
-import { signupSchema } from "../validator/form.validation.js";
-import { hashPassword } from "../utils/hash.js";
-import { createUser } from "../services/auth.services.js";
+import { loginSchema, signupSchema } from "../validator/form.validation.js";
+import { hashPassword, verifyPassword } from "../utils/hash.js";
+import { createUser, findUserByUserName } from "../services/auth.services.js";
 
 export const getSignupPage = (req, res) => {
   try {
@@ -49,8 +49,35 @@ export const signup = async (req, res) => {
   }
 };
 
-export const login = (req, res) => {
+export const login = async (req, res) => {
   try {
+    const { data, error } = loginSchema.safeParse(req.body);
+
+    if (error) {
+      req.flash("errors", error.errors[0].message);
+      return res.redirect("/login");
+    }
+
+    const { userName, password } = data;
+
+    const userData = await findUserByUserName(userName);
+
+    if (!userData) {
+      req.flash("errors", "Wrong User Name or Password");
+      return res.redirect("/login");
+    }
+
+    const checkPassword = await verifyPassword({
+      password,
+      hashedPassword: userData.password,
+    });
+
+    if (!checkPassword) {
+      req.flash("errors", "Wrong User Name or Password");
+      return res.redirect("/login");
+    }
+
+    return res.redirect("/");
   } catch (err) {
     req.flash("errors", "Something went wrong");
     return res.redirect("/login");
