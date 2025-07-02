@@ -1,9 +1,11 @@
 import { loginSchema, signupSchema } from "../validator/form.validation.js";
 import { hashPassword, verifyPassword } from "../utils/hash.js";
-import { createUser, findUserByUserName } from "../services/auth.services.js";
-import { signToken } from "../utils/token.js";
-import { email } from "zod/v4";
-import { ACCESS_TOKEN_EXPIRY, MILI_SEC } from "../config/const.js";
+import {
+  createNewSession,
+  createUser,
+  findUserByUserName,
+} from "../services/auth.services.js";
+import { setUpAuthCookies } from "../utils/auth.cookie.js";
 
 export const getSignupPage = (req, res) => {
   try {
@@ -80,22 +82,24 @@ export const login = async (req, res) => {
       return res.redirect("/login");
     }
 
-    const tokenData = {
+    const newSession = await createNewSession({
+      userId: userData.id,
+      userAgent: req.headers["user-agent"],
+      ip: req.clientIp,
+    });
+
+    if (!newSession) {
+      req.flash("errors", "Session Couldn't be Created");
+      return res.redirect("/login");
+    }
+
+    setUpAuthCookies(res, {
       name: userData.name,
       userName: userData.userName,
       email: userData.email,
-    };
-
-    const preConfig = {
-      httpOnly: true,
-      secure: true,
-    };
-
-    const accessToken = signToken(tokenData, ACCESS_TOKEN_EXPIRY / MILI_SEC);
-    res.cookie("access_token", accessToken, {
-      ...preConfig,
-      maxAge: ACCESS_TOKEN_EXPIRY,
+      sessionId: newSession.id,
     });
+
     return res.redirect("/");
   } catch (err) {
     req.flash("errors", "Something went wrong");
@@ -106,6 +110,7 @@ export const login = async (req, res) => {
 export const logout = (req, res) => {
   try {
     res.clearCookie("access_token");
+    res.clearCookie("refresh_token");
     return res.redirect("/login");
   } catch (err) {
     return res.status(404).send("Something went wrong");
