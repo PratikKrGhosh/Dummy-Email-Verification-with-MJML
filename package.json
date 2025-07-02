@@ -1,0 +1,37 @@
+{
+  "name": "dummy-email-verification-with-mjml",
+  "version": "1.0.0",
+  "description": "This is a dummy email verification project using nodemailer and ethereal. I used MJML for styling the email",
+  "keywords": [
+    "drizzle",
+    "orm",
+    "nodemailer",
+    "mjml",
+    "ethereal"
+  ],
+  "homepage": "https://github.com/PratikKrGhosh/Dummy-Email-Verification-with-MJML#readme",
+  "bugs": {
+    "url": "https://github.com/PratikKrGhosh/Dummy-Email-Verification-with-MJML/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PratikKrGhosh/Dummy-Email-Verification-with-MJML.git"
+  },
+  "license": "MIT",
+  "author": "Pratik Kumar Ghosh",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon server/server.js"
+  },
+  "dependencies": {
+    "connect-flash": "^0.1.1",
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^17.0.1",
+    "ejs": "^3.1.10",
+    "express": "^5.1.0",
+    "express-session": "^1.18.1",
+    "zod": "^3.25.67"
+  }
+}
