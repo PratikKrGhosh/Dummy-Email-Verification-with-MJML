@@ -1,0 +1,16 @@
+/* body css */
+body {
+  justify-content: center;
+}
+
+/* form CSS */
+form {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border: 2px solid black;
+  border-radius: 5px;
+}

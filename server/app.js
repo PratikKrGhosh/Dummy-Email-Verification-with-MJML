@@ -14,7 +14,7 @@ app.use(
 app.use("/", authRouter);
 
 app.get("/", (req, res) => {
-  res.status(200).send("Home Page");
+  res.status(200).render("index");
 });
 
 export default app;
