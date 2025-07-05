@@ -20,6 +20,10 @@ import { setUpAuthCookies } from "../utils/auth.cookie.js";
 import { generateVerificationToken } from "../utils/token.generator.js";
 import { generateEmailVerificationUri } from "../utils/link.generator.js";
 import { sendMail } from "../libs/nodemailer.js";
+import path from "path";
+import fs from "fs/promises";
+import ejs from "ejs";
+import mjml2html from "mjml";
 
 export const getSignupPage = (req, res) => {
   if (req.user) return res.redirect("/");
@@ -172,11 +176,21 @@ export const getEmailVerifyCode = async (req, res) => {
       email: req.user.email,
     });
 
-    const to = req.user.email;
-    const subject = "Verify Your Email";
-    const html = `<p>${token}</p><br /><a href="${verifyUri}">Click to Verify</a>`;
+    const mjmlTemplate = await fs.readFile(
+      path.join(import.meta.dirname, "..", "emails", "verify-email.mjml"),
+      "utf-8"
+    );
+    const filledTemplate = ejs.render(mjmlTemplate, { token, verifyUri });
+    const htmlOutput = mjml2html(filledTemplate).html;
 
-    await sendMail({ to, subject, html });
+    // const htmlOutput = `<p>${token}</p><br /><a href="${verifyUri}">Click to Verify</a>`;
+    console.log(htmlOutput);
+
+    await sendMail({
+      to: req.user.email,
+      subject: "Verify Your Email",
+      html: htmlOutput,
+    }).catch(console.error("sendMail Function Error"));
     return res.redirect("/verify-email");
   } catch (err) {
     return res.status(400).send("Something went wrong");
