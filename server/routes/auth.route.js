@@ -1,5 +1,6 @@
 import express from "express";
 import * as authController from "../controllers/auth.controller.js";
+import * as formValidation from "../validator/form.validation.js";
 
 const authRouter = express.Router();
 
@@ -14,5 +15,12 @@ authRouter
   .post(authController.login);
 
 authRouter.route("/logout").get(authController.logout);
+
+authRouter
+  .route("/verify-email")
+  .get(authController.getEmailVerifyPage)
+  .post(authController.getEmailVerifyCode);
+
+authRouter.route("/verify-email-code").get(authController.verifyEmail);
 
 export default authRouter;

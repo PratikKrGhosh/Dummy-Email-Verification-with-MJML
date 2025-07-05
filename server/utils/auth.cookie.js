@@ -5,8 +5,11 @@ import {
 } from "../config/const.js";
 import { signToken } from "./token.js";
 
-export const setUpAuthCookies = (res, { name, userName, email, sessionId }) => {
-  const tokenData = { name, userName, email, sessionId };
+export const setUpAuthCookies = (
+  res,
+  { name, userName, email, isVerified, sessionId }
+) => {
+  const tokenData = { name, userName, email, isVerified, sessionId };
 
   const preConfig = {
     httpOnly: true,

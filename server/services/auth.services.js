@@ -45,6 +45,7 @@ export const getUserDataUsingSessionId = async (sessionId) => {
         name: usersTable.name,
         userName: usersTable.userName,
         email: usersTable.email,
+        isVerified: usersTable.isVerified,
         sessionId: sessionTable.id,
       })
       .from(usersTable)

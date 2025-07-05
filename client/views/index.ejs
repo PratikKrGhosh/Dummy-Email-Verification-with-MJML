@@ -14,6 +14,14 @@
     <a href="/login"><button>Log in</button></a>
     <% }else{ %>
     <p>You are Logged in</p>
+    <% if (!user.isVerified){ %>
+    <div>
+      <p>Not Verified</p>
+      <a href="/verify-email">verify</a>
+    </div>
+    <% }else{ %>
+    <p>Verified</p>
+    <% } %>
     <a href="/logout"><button>Log out</button></a>
     <% } %>
   </body>

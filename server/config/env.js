@@ -6,6 +6,11 @@ const config = {
     db: process.env.DB_URI,
     port: process.env.PORT || 3000,
     jwt_key: process.env.JWT_KEY || "abcde12345",
+    root: process.env.ROOT || "http://127.0.0.1",
+    rootUri:
+      `${process.env.ROOT}:${process.env.PORT}` ||
+      `http://127.0.0.1:${process.env.PORT}` ||
+      "http://127.0.0.1:3000",
     log: "bug",
   },
 };

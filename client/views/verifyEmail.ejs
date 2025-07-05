@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/style.css" />
+    <link rel="stylesheet" href="/form.css" />
+    <link rel="stylesheet" href="/verifyEmail.css" />
+    <title>Verify Your Email</title>
+  </head>
+  <body>
+    <h1>Let's Verify Your Email</h1>
+    <h3>Email: <%= user.email %></h3>
+    <form action="/verify-email" method="post" id="resedCodeForm">
+      <button type="submit">Resend Code</button>
+    </form>
+    <form action="/verify-email-code">
+      <input
+        type="text"
+        maxlength="8"
+        name="token"
+        id="token"
+        placeholder="8-digit Token"
+      />
+      <input type="hidden" name="email" value="<%= user.email %>" id="email" />
+      <button type="submit">Verify</button>
+      <% if (errors){ errors.forEach(err => { %>
+      <p><%= err %></p>
+      <% })} %>
+    </form>
+  </body>
+</html>

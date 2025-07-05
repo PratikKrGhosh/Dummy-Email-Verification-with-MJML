@@ -3,3 +3,22 @@ body {
   gap: 1rem;
   padding: 0.5rem;
 }
+
+/* home page CSS */
+div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+div > a {
+  background-color: blueviolet;
+  padding: 0.3rem;
+  border: 2px solid blueviolet;
+  border-radius: 6px;
+  text-decoration: none;
+  color: #fff;
+  letter-spacing: 0.15rem;
+  transform: scale(0.8);
+}

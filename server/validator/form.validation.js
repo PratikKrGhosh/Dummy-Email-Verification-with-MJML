@@ -20,3 +20,12 @@ export const signupSchema = loginSchema.extend({
     .max(20, { message: "Name can't have more than 20 charecters" }),
   email: z.string().trim().email({ message: "Please enter a valid email" }),
 });
+
+export const emailVerificationSchema = z.object({
+  token: z
+    .string()
+    .trim()
+    .max(8, { message: "Token Must Be of 8" })
+    .min(8, { message: "Token Must Be of 8" }),
+  email: z.string().email({ message: "Invalid Email" }),
+});

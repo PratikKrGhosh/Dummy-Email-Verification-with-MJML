@@ -1,19 +1,24 @@
-import { loginSchema, signupSchema } from "../validator/form.validation.js";
+import {
+  emailVerificationSchema,
+  loginSchema,
+  signupSchema,
+} from "../validator/form.validation.js";
 import { hashPassword, verifyPassword } from "../utils/hash.js";
 import {
   createNewSession,
   createUser,
   deleteSessionDataById,
-  deleteSessionDataByIp,
   findUserByUserName,
   getSessionDataById,
-  getSessionDataByIp,
 } from "../services/auth.services.js";
 import { setUpAuthCookies } from "../utils/auth.cookie.js";
+import { generateVerificationToken } from "../utils/token.generator.js";
+import { generateEmailVerificationUri } from "../utils/link.generator.js";
+import { sendMail } from "../libs/nodemailer.js";
 
 export const getSignupPage = (req, res) => {
+  if (req.user) return res.redirect("/");
   try {
-    if (req.user) return res.redirect("/");
     return res.status(200).render("signup", { errors: req.flash("errors") });
   } catch (err) {
     return res.status(404).send("Page Not Exist");
@@ -21,17 +26,28 @@ export const getSignupPage = (req, res) => {
 };
 
 export const getLoginPage = (req, res) => {
+  if (req.user) return res.redirect("/");
   try {
-    if (req.user) return res.redirect("/");
     return res.status(200).render("login", { errors: req.flash("errors") });
   } catch (err) {
     return res.status(404).send("Page Not Exist");
   }
 };
 
-export const signup = async (req, res) => {
+export const getEmailVerifyPage = (req, res) => {
+  if (!req.user) return res.redirect("/login");
   try {
-    if (req.user) return res.redirect("/");
+    return res
+      .status(200)
+      .render("verifyEmail", { errors: req.flash("errors") });
+  } catch (err) {
+    return res.status(404).send("Page Not Exist");
+  }
+};
+
+export const signup = async (req, res) => {
+  if (req.user) return res.redirect("/");
+  try {
     const { data, error } = signupSchema.safeParse(req.body);
 
     if (error) {
@@ -62,8 +78,8 @@ export const signup = async (req, res) => {
 };
 
 export const login = async (req, res) => {
+  if (req.user) return res.redirect("/");
   try {
-    if (req.user) return res.redirect("/");
     const { data, error } = loginSchema.safeParse(req.body);
 
     if (error) {
@@ -105,6 +121,7 @@ export const login = async (req, res) => {
       name: userData.name,
       userName: userData.userName,
       email: userData.email,
+      isVerified: userData.isVerified,
       sessionId: newSession.id,
     });
 
@@ -130,5 +147,44 @@ export const logout = async (req, res) => {
     return res.redirect("/login");
   } catch (err) {
     return res.status(404).send("Something went wrong");
+  }
+};
+
+export const getEmailVerifyCode = async (req, res) => {
+  if (!req.user) return res.redirect("/login");
+  try {
+    const token = generateVerificationToken();
+
+    const verifyUri = generateEmailVerificationUri({
+      token,
+      email: req.user.email,
+    });
+
+    const to = req.user.email;
+    const subject = "Verify Your Email";
+    const html = `<p>${token}</p><br /><a href="${verifyUri}">Click to Verify</a>`;
+
+    await sendMail({ to, subject, html });
+    return res.redirect("/verify-email");
+  } catch (err) {
+    return res.status(400).send("Something went wrong");
+  }
+};
+
+export const verifyEmail = (req, res) => {
+  if (!req.user) return res.redirect("/login");
+  try {
+    const { data, error } = emailVerificationSchema.safeParse(req.query);
+
+    if (error) {
+      req.flash("errors", error.errors[0].message);
+      return res.redirect("/verify-email");
+    }
+
+    const { token, email } = data;
+
+    return res.send({ token, email });
+  } catch (err) {
+    return res.status(400).send("Something went wrong");
   }
 };
