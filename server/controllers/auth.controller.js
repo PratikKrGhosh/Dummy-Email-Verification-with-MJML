@@ -7,6 +7,7 @@ import { hashPassword, verifyPassword } from "../utils/hash.js";
 import {
   createNewSession,
   createUser,
+  deleteAndInsertTokenData,
   deleteSessionDataById,
   findUserByUserName,
   getSessionDataById,
@@ -153,7 +154,13 @@ export const logout = async (req, res) => {
 export const getEmailVerifyCode = async (req, res) => {
   if (!req.user) return res.redirect("/login");
   try {
+    const userData = await findUserByUserName(req.user.userName);
+
+    if (!userData) return res.redirect("/login");
+
     const token = generateVerificationToken();
+
+    await deleteAndInsertTokenData({ userId: userData.id, token });
 
     const verifyUri = generateEmailVerificationUri({
       token,

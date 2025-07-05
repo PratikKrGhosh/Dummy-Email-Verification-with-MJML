@@ -1,6 +1,10 @@
 import { and, eq } from "drizzle-orm";
 import db from "../config/db.js";
-import { sessionTable, usersTable } from "../drizzle/schema.js";
+import {
+  sessionTable,
+  usersTable,
+  verifyEmailTable,
+} from "../drizzle/schema.js";
 
 export const createUser = async ({ name, userName, email, password }) => {
   try {
@@ -82,4 +86,19 @@ export const getSessionDataByIp = async (ip) => {
 export const deleteSessionDataByIp = async (ip) => {
   const [data] = await db.delete(sessionTable).where(eq(sessionTable.ip, ip));
   return data;
+};
+
+export const deleteAndInsertTokenData = async ({ userId, token }) => {
+  return db.transaction(async (tx) => {
+    try {
+      await tx
+        .delete(verifyEmailTable)
+        .where(eq(verifyEmailTable.userId, userId));
+
+      await tx.insert(verifyEmailTable).values({ userId, token });
+    } catch (err) {
+      console.log("Couldn't Delete and Insert Verify Email Token Data");
+      return null;
+    }
+  });
 };
