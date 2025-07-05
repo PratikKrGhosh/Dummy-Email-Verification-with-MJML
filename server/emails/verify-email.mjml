@@ -3,13 +3,11 @@
     <mj-title>Verify Your Email Address</mj-title>
   </mj-head>
   <mj-body>
-    <mj-container>
-      <mj-section>
-        <mj-column>
-          <mj-title>Code: <%= token %></mj-title>
-          <mj-button href="<%= verifyUri %>">Verify Now</mj-button>
-        </mj-column>
-      </mj-section>
-    </mj-container>
+    <mj-section>
+      <mj-column>
+        <mj-text>Code: <%= token %></mj-text>
+        <mj-button href="<%= verifyUri %>">Verify Now</mj-button>
+      </mj-column>
+    </mj-section>
   </mj-body>
 </mjml>

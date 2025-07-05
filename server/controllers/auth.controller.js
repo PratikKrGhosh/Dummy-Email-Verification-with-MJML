@@ -183,9 +183,6 @@ export const getEmailVerifyCode = async (req, res) => {
     const filledTemplate = ejs.render(mjmlTemplate, { token, verifyUri });
     const htmlOutput = mjml2html(filledTemplate).html;
 
-    // const htmlOutput = `<p>${token}</p><br /><a href="${verifyUri}">Click to Verify</a>`;
-    console.log(htmlOutput);
-
     await sendMail({
       to: req.user.email,
       subject: "Verify Your Email",
