@@ -102,3 +102,56 @@ export const deleteAndInsertTokenData = async ({ userId, token }) => {
     }
   });
 };
+
+export const getTokenDataByUserId = async (userId) => {
+  try {
+    const [data] = await db
+      .select()
+      .from(verifyEmailTable)
+      .where(eq(verifyEmailTable.userId, userId));
+    return data;
+  } catch (err) {
+    return null;
+  }
+};
+
+export const deleteTokenDataByUserId = async (userId) => {
+  try {
+    const [data] = await db
+      .delete(verifyEmailTable)
+      .where(verifyEmailTable.userId, userId);
+    return data;
+  } catch (err) {
+    return null;
+  }
+};
+
+export const findUserByEmail = async (email) => {
+  try {
+    const [data] = await db
+      .select()
+      .from(usersTable)
+      .where(eq(usersTable.email, email));
+    return data;
+  } catch (err) {
+    return null;
+  }
+};
+
+export const updateUserVerifyStatus = async (userId) => {
+  return db.transaction(async (tx) => {
+    try {
+      await tx
+        .update(usersTable)
+        .set({ isVerified: true })
+        .where(eq(usersTable.id, userId));
+
+      await tx
+        .delete(verifyEmailTable)
+        .where(eq(verifyEmailTable.userId, userId));
+    } catch (err) {
+      console.log("Could not modify Verify Status of the User");
+      return null;
+    }
+  });
+};

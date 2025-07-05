@@ -9,8 +9,12 @@ import {
   createUser,
   deleteAndInsertTokenData,
   deleteSessionDataById,
+  deleteTokenDataByUserId,
+  findUserByEmail,
   findUserByUserName,
   getSessionDataById,
+  getTokenDataByUserId,
+  updateUserVerifyStatus,
 } from "../services/auth.services.js";
 import { setUpAuthCookies } from "../utils/auth.cookie.js";
 import { generateVerificationToken } from "../utils/token.generator.js";
@@ -153,6 +157,7 @@ export const logout = async (req, res) => {
 
 export const getEmailVerifyCode = async (req, res) => {
   if (!req.user) return res.redirect("/login");
+  if (req.user.isVerified) return res.redirect("/");
   try {
     const userData = await findUserByUserName(req.user.userName);
 
@@ -178,8 +183,9 @@ export const getEmailVerifyCode = async (req, res) => {
   }
 };
 
-export const verifyEmail = (req, res) => {
+export const verifyEmail = async (req, res) => {
   if (!req.user) return res.redirect("/login");
+  if (req.user.isVerified) return res.redirect("/");
   try {
     const { data, error } = emailVerificationSchema.safeParse(req.query);
 
@@ -190,7 +196,39 @@ export const verifyEmail = (req, res) => {
 
     const { token, email } = data;
 
-    return res.send({ token, email });
+    const userData = await findUserByEmail(email);
+
+    if (!userData) {
+      await deleteTokenDataByUserId(userData.id);
+      return res.redirect("/login");
+    }
+
+    if (userData.isVerified) {
+      await deleteTokenDataByUserId(userData.id);
+      return res.redirect("/");
+    }
+
+    const tokenData = await getTokenDataByUserId(userData.id);
+
+    if (!tokenData.valid) {
+      await deleteTokenDataByUserId(userData.id);
+      return res.redirect("/verify-email");
+    }
+
+    if (tokenData.token == token) {
+      await updateUserVerifyStatus(userData.id);
+      const updatedUserData = await findUserByEmail(email);
+
+      setUpAuthCookies(res, {
+        name: updatedUserData.name,
+        userName: updatedUserData.userName,
+        email: updatedUserData.email,
+        isVerified: updatedUserData.isVerified,
+        sessionId: userData.sessionId,
+      });
+    }
+
+    return res.redirect("/");
   } catch (err) {
     return res.status(400).send("Something went wrong");
   }
