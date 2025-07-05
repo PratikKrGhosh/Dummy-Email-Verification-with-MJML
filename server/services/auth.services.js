@@ -56,3 +56,29 @@ export const getUserDataUsingSessionId = async (sessionId) => {
     return null;
   }
 };
+
+export const getSessionDataById = async (id) => {
+  const [data] = await db
+    .select()
+    .from(sessionTable)
+    .where(eq(sessionTable.id, id));
+  return data;
+};
+
+export const deleteSessionDataById = async (id) => {
+  const [data] = await db.delete(sessionTable).where(eq(sessionTable.id, id));
+  return data;
+};
+
+export const getSessionDataByIp = async (ip) => {
+  const [data] = await db
+    .select()
+    .from(sessionTable)
+    .where(eq(sessionTable.ip, ip));
+  return data;
+};
+
+export const deleteSessionDataByIp = async (ip) => {
+  const [data] = await db.delete(sessionTable).where(eq(sessionTable.ip, ip));
+  return data;
+};

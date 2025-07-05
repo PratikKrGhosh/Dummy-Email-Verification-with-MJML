@@ -3,12 +3,17 @@ import { hashPassword, verifyPassword } from "../utils/hash.js";
 import {
   createNewSession,
   createUser,
+  deleteSessionDataById,
+  deleteSessionDataByIp,
   findUserByUserName,
+  getSessionDataById,
+  getSessionDataByIp,
 } from "../services/auth.services.js";
 import { setUpAuthCookies } from "../utils/auth.cookie.js";
 
 export const getSignupPage = (req, res) => {
   try {
+    if (req.user) return res.redirect("/");
     return res.status(200).render("signup", { errors: req.flash("errors") });
   } catch (err) {
     return res.status(404).send("Page Not Exist");
@@ -17,6 +22,7 @@ export const getSignupPage = (req, res) => {
 
 export const getLoginPage = (req, res) => {
   try {
+    if (req.user) return res.redirect("/");
     return res.status(200).render("login", { errors: req.flash("errors") });
   } catch (err) {
     return res.status(404).send("Page Not Exist");
@@ -25,6 +31,7 @@ export const getLoginPage = (req, res) => {
 
 export const signup = async (req, res) => {
   try {
+    if (req.user) return res.redirect("/");
     const { data, error } = signupSchema.safeParse(req.body);
 
     if (error) {
@@ -56,6 +63,7 @@ export const signup = async (req, res) => {
 
 export const login = async (req, res) => {
   try {
+    if (req.user) return res.redirect("/");
     const { data, error } = loginSchema.safeParse(req.body);
 
     if (error) {
@@ -107,8 +115,16 @@ export const login = async (req, res) => {
   }
 };
 
-export const logout = (req, res) => {
+export const logout = async (req, res) => {
+  if (!req.user) return res.redirect("/login");
   try {
+    const { sessionId } = req.user;
+    const sessionData = await getSessionDataById(sessionId);
+
+    if (!sessionData || !sessionData.valid) return res.redirect("/login");
+
+    await deleteSessionDataById(sessionId);
+
     res.clearCookie("access_token");
     res.clearCookie("refresh_token");
     return res.redirect("/login");
